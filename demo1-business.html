@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ember & Grain — Farm-to-Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --cream: #F5EFE0;
+    --warm: #C8A97E;
+    --dark: #1E1812;
+    --rust: #A84B2F;
+    --olive: #5C6B3A;
+    --sand: #E8D9BC;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 4rem;
+    background: rgba(245,239,224,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(200,169,126,0.3);
+    animation: fadeDown 0.8s ease forwards;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    color: var(--dark);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none; color: var(--dark); font-size: 0.82rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--rust); }
+  .nav-cta {
+    background: var(--rust); color: white !important;
+    padding: 0.5rem 1.4rem; border-radius: 2px;
+  }
+  .nav-cta:hover { background: var(--dark); color: white !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 6rem 4rem 6rem 6rem;
+    animation: fadeLeft 1s 0.3s ease forwards; opacity: 0;
+  }
+  .hero-eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--olive); margin-bottom: 1.5rem; font-weight: 500;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-eyebrow::before {
+    content: ''; width: 40px; height: 1px; background: var(--olive);
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    line-height: 1.1;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+  }
+  h1 em { color: var(--rust); font-style: italic; }
+  .hero-sub {
+    font-size: 1rem; line-height: 1.8; color: #5a4d3a;
+    max-width: 440px; margin-bottom: 2.5rem;
+  }
+  .btn-row { display: flex; gap: 1rem; align-items: center; }
+  .btn-primary {
+    background: var(--rust); color: white;
+    padding: 0.9rem 2.2rem; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 0.82rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--dark); transform: translateY(-2px); }
+  .btn-ghost {
+    color: var(--dark); font-size: 0.82rem;
+    letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400;
+    text-decoration: none; border-bottom: 1px solid var(--warm);
+    padding-bottom: 2px; transition: color 0.3s;
+  }
+  .btn-ghost:hover { color: var(--rust); }
+
+  .hero-right {
+    position: relative; overflow: hidden;
+    animation: fadeRight 1s 0.3s ease forwards; opacity: 0;
+  }
+  .hero-img-bg {
+    width: 100%; height: 100%;
+    background: linear-gradient(145deg, #8B6240 0%, #5C3D20 40%, #1E1812 100%);
+    position: relative; display: flex; align-items: center; justify-content: center;
+  }
+  .hero-img-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-plate {
+    width: 300px; height: 300px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #D4956A, #8B4513);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8rem;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4), inset 0 0 60px rgba(255,255,255,0.05);
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  .hero-badge {
+    position: absolute; bottom: 3rem; left: -2rem;
+    background: var(--cream); border: 1px solid var(--sand);
+    padding: 1rem 1.5rem; border-radius: 4px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    animation: float 4s 1s ease-in-out infinite;
+  }
+  .hero-badge span { font-size: 1.6rem; font-weight: 700; color: var(--rust); display: block; }
+  .hero-badge small { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: #5a4d3a; }
+
+  /* STRIP */
+  .strip {
+    background: var(--dark); color: var(--warm);
+    padding: 1rem 0; overflow: hidden;
+  }
+  .strip-inner {
+    display: flex; gap: 4rem; width: max-content;
+    animation: scroll 20s linear infinite;
+    font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .strip-dot { color: var(--rust); }
+
+  /* SERVICES */
+  #services {
+    padding: 8rem 6rem;
+    position: relative;
+  }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 4rem;
+  }
+  .section-label {
+    font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--olive); font-weight: 500; margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-label::before { content: ''; width: 30px; height: 1px; background: var(--olive); }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.2;
+  }
+  .services-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  }
+  .service-card {
+    background: var(--sand); padding: 3rem 2.5rem;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .service-card:hover { background: var(--dark); }
+  .service-card:hover .service-name, .service-card:hover .service-desc, .service-card:hover .service-price { color: var(--cream); }
+  .service-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; width: 0; height: 3px;
+    background: var(--rust); transition: width 0.4s;
+  }
+  .service-card:hover::before { width: 100%; }
+  .service-num {
+    font-family: 'Playfair Display', serif; font-size: 3.5rem;
+    color: rgba(0,0,0,0.06); font-style: italic;
+    position: absolute; top: 1rem; right: 1.5rem;
+    transition: color 0.3s;
+  }
+  .service-card:hover .service-num { color: rgba(255,255,255,0.06); }
+  .service-icon { font-size: 2.2rem; margin-bottom: 1.5rem; display: block; }
+  .service-name {
+    font-family: 'Playfair Display', serif; font-size: 1.4rem;
+    margin-bottom: 0.8rem; transition: color 0.3s;
+  }
+  .service-desc { font-size: 0.88rem; line-height: 1.7; color: #5a4d3a; transition: color 0.3s; }
+  .service-price {
+    margin-top: 1.5rem; font-size: 0.8rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--rust); font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  /* ABOUT */
+  #about {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 70vh;
+  }
+  .about-visual {
+    background: linear-gradient(160deg, var(--olive) 0%, #2C3A1A 100%);
+    padding: 5rem; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .about-visual::before {
+    content: '';
+    position: absolute; width: 400px; height: 400px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+  }
+  .about-visual::after {
+    content: '';
+    position: absolute; width: 600px; height: 600px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+  }
+  .about-stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    position: relative; z-index: 1;
+  }
+  .about-stat {
+    background: rgba(0,0,0,0.2); padding: 2.5rem;
+    text-align: center; backdrop-filter: blur(10px);
+  }
+  .about-stat span {
+    font-family: 'Playfair Display', serif; font-size: 3rem;
+    color: var(--warm); display: block;
+  }
+  .about-stat small {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); margin-top: 0.3rem; display: block;
+  }
+  .about-text {
+    padding: 6rem 5rem; display: flex; flex-direction: column; justify-content: center;
+  }
+  .about-text h2 { margin-bottom: 1.5rem; }
+  .about-text p { font-size: 0.95rem; line-height: 1.9; color: #5a4d3a; margin-bottom: 1.2rem; }
+  .about-text p:last-of-type { margin-bottom: 2rem; }
+  .chef-sig {
+    font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 1.5rem; color: var(--rust);
+  }
+  .chef-sig small { display: block; font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    letter-spacing: 0.15em; text-transform: uppercase; font-style: normal;
+    color: #5a4d3a; margin-top: 0.3rem; }
+
+  /* CONTACT */
+  #contact {
+    background: var(--dark); color: var(--cream);
+    padding: 8rem 6rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+    align-items: center;
+  }
+  #contact h2 { color: var(--cream); margin-bottom: 1rem; }
+  #contact p { color: rgba(245,239,224,0.65); line-height: 1.8; font-size: 0.95rem; margin-bottom: 2.5rem; }
+  .contact-methods { display: flex; flex-direction: column; gap: 1.2rem; }
+  .contact-link {
+    display: flex; align-items: center; gap: 1rem;
+    color: var(--cream); text-decoration: none;
+    font-size: 0.88rem; letter-spacing: 0.05em;
+    padding: 1rem 1.5rem; border: 1px solid rgba(200,169,126,0.2);
+    transition: all 0.3s;
+  }
+  .contact-link:hover { background: var(--rust); border-color: var(--rust); }
+  .contact-link .icon { font-size: 1.3rem; }
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .contact-form input, .contact-form textarea, .contact-form select {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(200,169,126,0.2);
+    color: var(--cream); padding: 1rem 1.2rem;
+    font-family: 'Jost', sans-serif; font-size: 0.88rem;
+    outline: none; transition: border-color 0.3s;
+    width: 100%;
+  }
+  .contact-form input::placeholder, .contact-form textarea::placeholder { color: rgba(245,239,224,0.3); }
+  .contact-form input:focus, .contact-form textarea:focus { border-color: var(--warm); }
+  .contact-form textarea { resize: vertical; min-height: 100px; }
+  .contact-form select option { background: var(--dark); }
+  .btn-submit {
+    background: var(--rust); color: white; border: none; cursor: pointer;
+    padding: 1rem; font-family: 'Jost', sans-serif; font-size: 0.82rem;
+    letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500;
+    transition: background 0.3s; margin-top: 0.5rem;
+  }
+  .btn-submit:hover { background: var(--warm); }
+
+  /* FOOTER */
+  footer {
+    background: var(--dark); border-top: 1px solid rgba(200,169,126,0.1);
+    padding: 2rem 6rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  footer span { font-size: 0.78rem; color: rgba(245,239,224,0.4); letter-spacing: 0.08em; }
+  .footer-logo { font-family: 'Playfair Display', serif; color: var(--warm); font-size: 1.1rem; }
+  .footer-socials { display: flex; gap: 1rem; }
+  .footer-socials a {
+    color: rgba(245,239,224,0.4); font-size: 0.78rem;
+    text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em;
+    transition: color 0.3s;
+  }
+  .footer-socials a:hover { color: var(--warm); }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 2rem; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { height: 50vh; }
+    .hero-left { padding: 4rem 2rem; }
+    #services { padding: 5rem 2rem; }
+    .services-grid { grid-template-columns: 1fr; }
+    #about { grid-template-columns: 1fr; }
+    #contact { grid-template-columns: 1fr; padding: 5rem 2rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Ember & Grain</a>
+  <ul class="nav-links">
+    <li><a href="#services">Menu</a></li>
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#contact" class="nav-cta">Reserve a Table</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Farm to Table · Est. 2019</div>
+    <h1>Where the <em>Earth</em> Feeds the Soul</h1>
+    <p class="hero-sub">Handcrafted meals rooted in seasonal ingredients, sourced directly from local farms. Every dish is a story of land, labor, and love.</p>
+    <div class="btn-row">
+      <a href="#contact" class="btn-primary">Book a Table</a>
+      <a href="#services" class="btn-ghost">View Menu</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-bg">
+      <div class="hero-plate">🌿</div>
+      <div class="hero-badge">
+        <span>4.9</span>
+        <small>⭐ 200+ Reviews</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-inner">
+    <span>Farm Fresh</span><span class="strip-dot">✦</span>
+    <span>Seasonal Menu</span><span class="strip-dot">✦</span>
+    <span>Wood-fired Oven</span><span class="strip-dot">✦</span>
+    <span>Local Sourced</span><span class="strip-dot">✦</span>
+    <span>Craft Cocktails</span><span class="strip-dot">✦</span>
+    <span>Private Events</span><span class="strip-dot">✦</span>
+    <span>Farm Fresh</span><span class="strip-dot">✦</span>
+    <span>Seasonal Menu</span><span class="strip-dot">✦</span>
+    <span>Wood-fired Oven</span><span class="strip-dot">✦</span>
+    <span>Local Sourced</span><span class="strip-dot">✦</span>
+    <span>Craft Cocktails</span><span class="strip-dot">✦</span>
+    <span>Private Events</span><span class="strip-dot">✦</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header">
+    <div>
+      <div class="section-label">What We Offer</div>
+      <h2>Our Signature<br>Experiences</h2>
+    </div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <span class="service-num">01</span>
+      <span class="service-icon">🍽️</span>
+      <div class="service-name">Tasting Menu</div>
+      <p class="service-desc">A curated 7-course journey through the season, paired with natural wines and handcrafted accompaniments.</p>
+      <div class="service-price">From $95 per person</div>
+    </div>
+    <div class="service-card">
+      <span class="service-num">02</span>
+      <span class="service-icon">🔥</span>
+      <div class="service-name">Wood-fired Mains</div>
+      <p class="service-desc">Slow-roasted heritage meats and root vegetables kissed by oak flame. Rustic. Honest. Unforgettable.</p>
+      <div class="service-price">From $28 per dish</div>
+    </div>
+    <div class="service-card">
+      <span class="service-num">03</span>
+      <span class="service-icon">🥂</span>
+      <div class="service-name">Private Dining</div>
+      <p class="service-desc">Host intimate gatherings in our cellar room — bespoke menus, sommelier-led pairings, exclusive ambiance.</p>
+      <div class="service-price">From $500 for groups</div>
+    </div>
+    <div class="service-card">
+      <span class="service-num">04</span>
+      <span class="service-icon">🌾</span>
+      <div class="service-name">Farm Brunch</div>
+      <p class="service-desc">Weekend mornings done right — sourdough stacks, free-range eggs, house-cured meats, fresh-pressed juice.</p>
+      <div class="service-price">From $18 per plate</div>
+    </div>
+    <div class="service-card">
+      <span class="service-num">05</span>
+      <span class="service-icon">🎂</span>
+      <div class="service-name">Catering & Events</div>
+      <p class="service-desc">We bring the Ember & Grain experience to your venue — weddings, corporate events, milestone celebrations.</p>
+      <div class="service-price">Custom packages</div>
+    </div>
+    <div class="service-card" style="background: var(--rust); cursor: pointer;">
+      <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:1rem;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.8rem; color:white; line-height:1.3;">Ready to<br><em>dine with us?</em></div>
+        <a href="#contact" style="color:white; font-size:0.78rem; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.5); padding-bottom:2px;">Reserve Now →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual">
+    <div class="about-stat-grid">
+      <div class="about-stat"><span>12</span><small>Local Farms</small></div>
+      <div class="about-stat"><span>5yr</span><small>In Business</small></div>
+      <div class="about-stat"><span>40+</span><small>Seasonal Dishes</small></div>
+      <div class="about-stat"><span>3K+</span><small>Happy Guests</small></div>
+    </div>
+  </div>
+  <div class="about-text">
+    <div class="section-label">Our Story</div>
+    <h2>Rooted in the Land,<br>Raised by Community</h2>
+    <p>Ember & Grain was born from a simple belief — that the best food comes from the best soil, and the best meals are shared. Chef Miriam Cole spent years in Michelin kitchens before returning home to build something more personal.</p>
+    <p>Every ingredient is chosen with care, every dish tells a story, and every guest leaves a little more connected to where their food comes from.</p>
+    <div class="chef-sig">Miriam Cole<small>Executive Chef & Founder</small></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div>
+    <div class="section-label" style="color: var(--warm);">Find Us</div>
+    <h2>Come dine with us</h2>
+    <p>We're open Tuesday through Sunday, lunch and dinner. Walk-ins welcome, but reservations are encouraged.</p>
+    <div class="contact-methods">
+      <a href="https://wa.me/15551234567" class="contact-link">
+        <span class="icon">💬</span> WhatsApp Us: +1 555 123 4567
+      </a>
+      <a href="mailto:hello@emberandgrain.com" class="contact-link">
+        <span class="icon">✉️</span> hello@emberandgrain.com
+      </a>
+      <a href="#" class="contact-link">
+        <span class="icon">📍</span> 24 Harvest Lane, Portland, OR
+      </a>
+    </div>
+  </div>
+  <div>
+    <div class="section-label" style="color: var(--warm); margin-bottom:1.5rem;">Make a Reservation</div>
+    <div class="contact-form">
+      <div class="form-row">
+        <input type="text" placeholder="Your Name"/>
+        <input type="email" placeholder="Email Address"/>
+      </div>
+      <div class="form-row">
+        <input type="date"/>
+        <select><option>2 Guests</option><option>3 Guests</option><option>4+ Guests</option></select>
+      </div>
+      <textarea placeholder="Special requests or dietary needs..."></textarea>
+      <button class="btn-submit">Confirm Reservation</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-logo">Ember & Grain</span>
+  <span>© 2025 Ember & Grain. All rights reserved.</span>
+  <div class="footer-socials">
+    <a href="#">Instagram</a>
+    <a href="#">Facebook</a>
+    <a href="#">TikTok</a>
+  </div>
+</footer>
+
+</body>
+</html>
